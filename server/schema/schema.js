@@ -1,3 +1,4 @@
+//npm install graphql
 const graphql = require('graphql');
 
 //Access our necessary graphql classes
