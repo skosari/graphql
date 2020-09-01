@@ -12,7 +12,7 @@ const app = express();
 //localhost:4000/graphql
 app.use('/graphql', graphqlHTTP({
   graphiql: true,
-  schema: schema //Telling our app that we are using the schema.js file for our scheme. Since this is ES6 we can omit writting schema:schema and just write schema
+  schema: schema, //Telling our app that we are using the schema.js file for our scheme. Since this is ES6 we can omit writting schema:schema and just write schema
 })) 
 
 //npm app.js
