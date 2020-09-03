@@ -19,9 +19,9 @@ var hobbyData = [
   {id:'2', title:'RC Boats', description: 'battery operated small scale radio controlled boats'},
   {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes'},
 ]
-var postData = [
-  {id: '1', comment: 'first post'},
-  {id: '2', comment: 'second post'}
+var postData = [//We add the userID that the posData corresponds to in this case usersData.id
+  {id: '1', comment: 'first post', userId: 3},
+  {id: '2', comment: 'second post', userId: 1 }
 ]
 
 //Access our necessary graphql classes
@@ -63,7 +63,35 @@ const PostType = new GraphQLObjectType({
   description: 'Post',
   fields: () => ({
     id: {type: GraphQLID},
-    comment: {type: GraphQLString}
+    comment: {type: GraphQLString},
+    user: {
+      type: UserType,
+      resolve(parent, args) {
+        return _.find(usersData, {id: parent.userId})//return userID from the parent-PostType that corresponds to the user:{type: UserType} userID is listed in PostType as the id from usersData
+//we can access the usersdata from a post query with this resolver using the following query
+        //post(id:2) {
+        //  id
+        //  comment
+        //  user {
+        //    name
+        //    age
+        //  }
+        //}
+        //which will return the following
+        // {
+        //   "data": {
+        //     "post": {
+        //       "id": "2",
+        //       "comment": "second post",
+        //       "user": {
+        //         "name": "Siamak",
+        //         "age": 39
+        //       }
+        //     }
+        //   }
+        // }
+      }
+    }
   })
 });
 
