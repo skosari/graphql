@@ -15,12 +15,12 @@ var usersData = [
   {id:6, name:'Leia',     age: 2,  driving: 'no'},
 ]
 var hobbyData = [
-  {id:'1', title:'RC Cars', description: 'battery operated small scale radio controlled cars'},
-  {id:'2', title:'RC Boats', description: 'battery operated small scale radio controlled boats'},
-  {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes'},
+  {id:'1', title:'RC Cars',   description: 'battery operated small scale radio controlled cars',   userId: 1},
+  {id:'2', title:'RC Boats',  description: 'battery operated small scale radio controlled boats',  userId: 4},
+  {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes', userId: 1},
 ]
 var postData = [//We add the userID that the posData corresponds to in this case usersData.id
-  {id: '1', comment: 'first post', userId: 3},
+  {id: '1', comment: 'first post',  userId: 3},
   {id: '2', comment: 'second post', userId: 1 }
 ]
 
@@ -31,7 +31,8 @@ const  {
   GraphQLID, //for ID types - when inputing data make sure to wrap id in '' but you can omit the "" when querying data
   GraphQLString, //string types
   GraphQLInt, //numbers
-  GraphQLNonNull //required types
+  GraphQLNonNull, //required types
+  GraphQLList //GraphQLList is used when we want to query the relationships between in this case user to posts and hobby from a user query
 } = graphql
 
 
@@ -41,10 +42,23 @@ const UserType = new GraphQLObjectType({
   description: 'Documentation for user...',
   fields: () => ({//Notice its wrapped in () to return everything inside
     //We use functions to define everything before its run and prevent undefined errors
-    id: {type: GraphQLInt},//GraphQLID will cast the input as a unique ID but for simplicity we used GraphQLString
+    id: {type: GraphQLID},//GraphQLID will cast the input as a unique ID but for simplicity we used GraphQLString
     name: {type: GraphQLString},//GraphQLString will cast the input as a string
     age: {type: GraphQLInt},//GraphQLInt will cast the input as integer
-    driving: {type: GraphQLString}
+    driving: {type: GraphQLString},
+    
+    posts: {
+      type: new GraphQLList(PostType),//use GRaphQLList to find the posts from a user query
+      resolve(parent, args) {
+        return _.filter(postData, {userId: parent.id});//find posts related to the userId from postData that corresponds to the user.id of userType which is linked to usersData in the RootQuery
+      }
+    },
+    hobby: {
+      type: new GraphQLList(HobbyType),//use GRaphQLList to find the posts from a user query
+      resolve(parent, args) {
+      return _.filter(hobbyData, {userId: parent.id});
+      }
+    }
   })
 });
 
@@ -54,7 +68,13 @@ const HobbyType = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLID},
     title: {type: GraphQLString},
-    description: {type: GraphQLString}
+    description: {type: GraphQLString},
+    user: {
+      type: UserType,
+      resolve(parent, args){
+        return _.find(usersData, {id: parent.userId})
+      }
+    }
   })
 });
 
@@ -126,6 +146,72 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
   }
 });
 
+//Tutorial Mutation - very simple example
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'Tutorial provided basic mutation type',
+  fields: {
+    CreateUser: {
+      type: UserType,
+      args: {
+        //id: {type: GraphQLID}
+        name: {type: GraphQLString},
+        age: {type: GraphQLInt},
+        driving: {type: GraphQLString}
+      },
+      resolve(parent,args) {
+        let user = {
+          name: args.name,
+          age: args.age,
+          driving: args.driving
+        }//This will save to memory not in database for tutorial only
+        return user;
+      }
+    },
+    CreatePost: {
+      type: PostType,
+      args: {
+        //id: {type: GraphQLID},
+        comment: {type: GraphQLString},
+        userId: {type: GraphQLID}
+      },
+      resolve(parent, args) {
+        let post = {
+          //id: args.id,
+          comment: args.comment,
+          userId: args.userId 
+        }
+        return post;
+      }
+    },
+    CreateHobby: {
+      type: HobbyType,
+      args: {
+        //id: {type: GraphQLID},
+        title: {type: GraphQLString},
+        description: {type: GraphQLString},
+        userId: {type: GraphQLID}
+      },
+      resolve(parent, args) {
+        let hobby = {
+          title: args.title,
+          description: args.description,
+          userId: args.userId
+        }
+        return hobby;
+      }
+    }
+  }
+});
+//mutation {
+//  createUser(name: "Xavier", age: 90, driving: "no"){
+//    name
+//    age
+//    driving
+//    id
+//  }
+//}
+
 // My own mutation query not from tutorial
 // const RootMutationType = new GraphQLObjectType({
 //   name: 'Mutation',
@@ -151,6 +237,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
 module.exports = new GraphQLSchema({
   query: RootQuery,
   // mutation: RootMutationType
+  mutation: Mutation
 })
 
 //A schema is a map of all the data and how they relate/interact
