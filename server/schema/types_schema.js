@@ -31,7 +31,8 @@ const Person = new GraphQLObjectType ({
     age:       {type: GraphQLInt},
     isMarried: {type: GraphQLBoolean},
     gpa:       {type: GraphQLFloat},
-  
+ 
+    //This is an object type - it requires us to specify a scalar. In this case we returned the parent object and we must query a scalar which would be age gpa etc...
     justAType: {
       type: Person,
       resolve(parent, args){
