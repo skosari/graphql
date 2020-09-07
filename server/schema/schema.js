@@ -90,28 +90,6 @@ const PostType = new GraphQLObjectType({
       type: UserType,
       resolve(parent, args) {
         return _.find(usersData, {id: parent.userId})//return userID from the parent-PostType that corresponds to the user:{type: UserType} userID is listed in PostType as the id from usersData
-//we can access the usersdata from a post query with this resolver using the following query
-        //post(id:2) {
-        //  id
-        //  comment
-        //  user {
-        //    name
-        //    age
-        //  }
-        //}
-        //which will return the following
-        // {
-        //   "data": {
-        //     "post": {
-        //       "id": "2",
-        //       "comment": "second post",
-        //       "user": {
-        //         "name": "Siamak",
-        //         "age": 39
-        //       }
-        //     }
-        //   }
-        // }
       }
     }
   })
@@ -146,6 +124,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       }
     },
 
+    //query all hobbies
     hobbies: {
       type: GraphQLList(HobbyType),
       resolve(parent,args){
@@ -163,6 +142,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       }
     },
 
+    //query all posts - posts is also used inside the user query to fgind the post of that individuals posts so if this ia usaed outside a user query then it will pull up all posts made regardless of user
     posts: {
       type: GraphQLList(PostType),
       resolve(parent,args){
@@ -231,40 +211,9 @@ const Mutation = new GraphQLObjectType({
     }
   }
 });
-//mutation {
-//  createUser(name: "Xavier", age: 90, driving: "no"){
-//    name
-//    age
-//    driving
-//    id
-//  }
-//}
-
-// My own mutation query not from tutorial
-// const RootMutationType = new GraphQLObjectType({
-//   name: 'Mutation',
-//   description: 'Root Mutation',
-//   fields: () => ({
-//     addUser: {
-//       type: UserType,
-//       args: {//args are the data we pass to the server
-//         // id: {type: GraphQLNonNull(GraphQLString)}, 
-//         name: {type: GraphQLNonNull(GraphQLString)},
-//         age: {type: GraphQLNonNull(GraphQLInt)}
-//         //GraphQLNonNull means these fields are required
-//       },
-//       resolve: (parent, args) => {//in resolve is where we add our data to the server
-//         const user = {id: usersData.length + 1, name: args.name, age: args.age}
-//         usersData.push(user)
-//         return user
-//       }
-//     }
-//   })
-// })
 
 module.exports = new GraphQLSchema({
   query: RootQuery,
-  // mutation: RootMutationType
   mutation: Mutation
 })
 

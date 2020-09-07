@@ -6,13 +6,14 @@ const express = require('express'); //npm install express --save
 const { graphqlHTTP } = require('express-graphql'); //npm install graphql --save
 
 const schema = require('./schema/schema');//Import our schema for use in app.use
+const testSchema = require('./schema/types_schema')
 
 const app = express();
 
 //localhost:4000/graphql
 app.use('/graphql', graphqlHTTP({
   graphiql: true,
-  schema: schema, //Telling our app that we are using the schema.js file for our scheme. Since this is ES6 we can omit writting schema:schema and just write schema
+  schema: testSchema //Telling our app that we are using the schema.js file for our scheme. Since this is ES6 we can omit writting schema:schema and just write schema
 })) 
 
 //npm app.js
