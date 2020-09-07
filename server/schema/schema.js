@@ -7,21 +7,21 @@ var _ = require('lodash');
 
 //Dummy Data
 var usersData = [
-  {id:1, name:'Siamak',   age: 39, driving: 'yes'},
-  {id:2, name:'Kambiz',   age: 51, driving: 'yes'},
-  {id:3, name:'Jenelle',  age: 39, driving: 'yes'},
-  {id:4, name:'Myles',    age: 6,  driving: 'no'},
-  {id:5, name:'Everrete', age: 6,  driving: 'no'},
-  {id:6, name:'Leia',     age: 2,  driving: 'no'},
+  {id:'1', name:'Siamak',   age: 39, driving: 'yes'},
+  {id:'2', name:'Kambiz',   age: 51, driving: 'yes'},
+  {id:'3', name:'Jenelle',  age: 39, driving: 'yes'},
+  {id:'4', name:'Myles',    age: 6,  driving: 'no'},
+  {id:'5', name:'Everrete', age: 6,  driving: 'no'},
+  {id:'6', name:'Leia',     age: 2,  driving: 'no'},
 ]
 var hobbyData = [
-  {id:'1', title:'RC Cars',   description: 'battery operated small scale radio controlled cars',   userId: 1},
-  {id:'2', title:'RC Boats',  description: 'battery operated small scale radio controlled boats',  userId: 4},
-  {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes', userId: 1},
+  {id:'1', title:'RC Cars',   description: 'battery operated small scale radio controlled cars',   userId: '1'},
+  {id:'2', title:'RC Boats',  description: 'battery operated small scale radio controlled boats',  userId: '4'},
+  {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes', userId: '1'},
 ]
 var postData = [//We add the userID that the posData corresponds to in this case usersData.id
-  {id: '1', comment: 'first post',  userId: 3},
-  {id: '2', comment: 'second post', userId: 1 }
+  {id: '1', comment: 'first post',  userId: '3' },
+  {id: '2', comment: 'second post', userId: '1' }
 ]
 
 //Access our necessary graphql classes
@@ -69,6 +69,7 @@ const HobbyType = new GraphQLObjectType({
     id: {type: GraphQLID},
     title: {type: GraphQLString},
     description: {type: GraphQLString},
+    userId: {type: GraphQLID},
     user: {
       type: UserType,
       resolve(parent, args){
@@ -84,6 +85,7 @@ const PostType = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLID},
     comment: {type: GraphQLString},
+    userId: {type: GraphQLID},
     user: {
       type: UserType,
       resolve(parent, args) {
@@ -122,11 +124,20 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
   fields: {
     user: {
       type: UserType,//we create userType and its fields in another const
-      args: {id: {type: GraphQLInt}}, //Arguments we pass along when we want to retrieve data from our user:
+      args: {id: {type: GraphQLID}}, //Arguments we pass along when we want to retrieve data from our user:
       resolve(parent, args) { // a function that tells graphql where to get the information - get and return data from a datasource
         return _.find(usersData, {id: args.id})//return in userData the args.ida - notice {id: args.id} was defined under user.args
       }
     },
+    
+    //query all user data
+    users: {
+      type: GraphQLList(UserType),
+      resolve(parent, args){
+        return usersData;
+      }
+    },
+
     hobby: {
       type: HobbyType,
       args: {id: {type: GraphQLID}},
@@ -134,6 +145,14 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
         return _.find(hobbyData, {id: args.id}) //Make hobbyData and notice the camel case
       }
     },
+
+    hobbies: {
+      type: GraphQLList(HobbyType),
+      resolve(parent,args){
+        return hobbyData;
+      }
+    },
+
     post: {
       type: PostType,
       description: 'Post new item',
@@ -142,7 +161,14 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
         //return data (post data)
         return _.find(postData, {id: args.id})
       }
-    }
+    },
+
+    posts: {
+      type: GraphQLList(PostType),
+      resolve(parent,args){
+        return postData;
+      }
+    },
   }
 });
 
@@ -154,13 +180,14 @@ const Mutation = new GraphQLObjectType({
     CreateUser: {
       type: UserType,
       args: {
-        //id: {type: GraphQLID}
+        id: {type: GraphQLID},
         name: {type: GraphQLString},
         age: {type: GraphQLInt},
         driving: {type: GraphQLString}
       },
       resolve(parent,args) {
         let user = {
+          id: args.id,
           name: args.name,
           age: args.age,
           driving: args.driving
@@ -171,13 +198,13 @@ const Mutation = new GraphQLObjectType({
     CreatePost: {
       type: PostType,
       args: {
-        //id: {type: GraphQLID},
+        id: {type: GraphQLID},
         comment: {type: GraphQLString},
         userId: {type: GraphQLID}
       },
       resolve(parent, args) {
         let post = {
-          //id: args.id,
+          id: args.id,
           comment: args.comment,
           userId: args.userId 
         }
@@ -187,13 +214,14 @@ const Mutation = new GraphQLObjectType({
     CreateHobby: {
       type: HobbyType,
       args: {
-        //id: {type: GraphQLID},
+        id: {type: GraphQLID},
         title: {type: GraphQLString},
         description: {type: GraphQLString},
         userId: {type: GraphQLID}
       },
       resolve(parent, args) {
         let hobby = {
+          id: args.id,
           title: args.title,
           description: args.description,
           userId: args.userId
