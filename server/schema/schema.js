@@ -31,7 +31,7 @@ const  {
   GraphQLID, //for ID types - when inputing data make sure to wrap id in '' but you can omit the "" when querying data
   GraphQLString, //string types
   GraphQLInt, //numbers
-  GraphQLNonNull, //required types
+  GraphQLNonNull, //required types - in graphiql you will see an ! next to doced objects/scalars
   GraphQLList //GraphQLList is used when we want to query the relationships between in this case user to posts and hobby from a user query
 } = graphql
 
@@ -69,7 +69,7 @@ const HobbyType = new GraphQLObjectType({
     id: {type: GraphQLID},
     title: {type: GraphQLString},
     description: {type: GraphQLString},
-    userId: {type: GraphQLID},
+    userId: {type: new GraphQLNonNull(GraphQLID)},
     user: {
       type: UserType,
       resolve(parent, args){
@@ -85,7 +85,7 @@ const PostType = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLID},
     comment: {type: GraphQLString},
-    userId: {type: GraphQLID},
+    userId: {type: new GraphQLNonNull(GraphQLID)},
     user: {
       type: UserType,
       resolve(parent, args) {
