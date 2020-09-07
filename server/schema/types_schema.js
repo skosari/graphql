@@ -3,23 +3,69 @@ const graphql = require('graphql');
 
 const {
   GraphQLObjectType,
-  GraphQLStringType,
-
+  GraphQLString,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLBoolean,
+  GraphQLFloat,
+  GraphQLSchema
 } = graphql
 
 //Scalar Types
+/*
+  String = GraphQLString
+  Int = GraphQLInt 
+  Float = GraphQLFloat
+  Boolean = GraphQLBoolean
+  ID = GraphQLID
+*/
+
+
+const Person = new GraphQLObjectType ({
+  name: 'Person',
+  description: 'Represents a person type',
+  fields: () => ({
+    id:        {type: GraphQLID},
+    name:      {type: GraphQLString},
+    age:       {type: GraphQLInt},
+    isMarried: {type: GraphQLBoolean},
+    gpa:       {type: GraphQLFloat},
+  
+    justAType: {
+      type: Person,
+      resolve(parent, args){
+        return parent;
+      }
+    }
+
+  })
+})
 
 
 //Root Query
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   description: 'Description',
-  fields: {
-    
+  fields: { 
+    person: {
+      type: Person,
+      resolve(parent,args) {
+        let personObj = {
+          id: '1',
+          name: 'Motzart',
+          age: 167,
+          isMarried: false,
+          gpa: 0.0
+        }
+        return personObj;
+      }
+    }
   }
 });
 
+
 module.exports = new GraphQLSchema({
-  query: RootQuery,
+  query: RootQuery
   //mutation: RootMutation
 })
