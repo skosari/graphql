@@ -5,24 +5,29 @@ const graphql = require('graphql');
 //npm i --save lodash     install inside your apps root folder
 var _ = require('lodash');
 
+//Import MongoDB models
+const User = require('../model/user');
+const Post = require('../model/post');
+const Hobby = require('../model/hobby');
+
 //Dummy Data
-var usersData = [
-  {id:'1', name:'Siamak',   age: 39, driving: 'yes'},
-  {id:'2', name:'Kambiz',   age: 51, driving: 'yes'},
-  {id:'3', name:'Jenelle',  age: 39, driving: 'yes'},
-  {id:'4', name:'Myles',    age: 6,  driving: 'no'},
-  {id:'5', name:'Everrete', age: 6,  driving: 'no'},
-  {id:'6', name:'Leia',     age: 2,  driving: 'no'},
-]
-var hobbyData = [
-  {id:'1', title:'RC Cars',   description: 'battery operated small scale radio controlled cars',   userId: '1'},
-  {id:'2', title:'RC Boats',  description: 'battery operated small scale radio controlled boats',  userId: '4'},
-  {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes', userId: '1'},
-]
-var postData = [//We add the userID that the posData corresponds to in this case usersData.id
-  {id: '1', comment: 'first post',  userId: '3' },
-  {id: '2', comment: 'second post', userId: '1' }
-]
+// var usersData = [
+//   {id:'1', name:'Siamak',   age: 39, driving: 'yes'},
+//   {id:'2', name:'Kambiz',   age: 51, driving: 'yes'},
+//   {id:'3', name:'Jenelle',  age: 39, driving: 'yes'},
+//   {id:'4', name:'Myles',    age: 6,  driving: 'no'},
+//   {id:'5', name:'Everrete', age: 6,  driving: 'no'},
+//   {id:'6', name:'Leia',     age: 2,  driving: 'no'},
+// ]
+// var hobbyData = [
+//   {id:'1', title:'RC Cars',   description: 'battery operated small scale radio controlled cars',   userId: '1'},
+//   {id:'2', title:'RC Boats',  description: 'battery operated small scale radio controlled boats',  userId: '4'},
+//   {id:'3', title:'RC Planes', description: 'battery operated small scale radio controlled planes', userId: '1'},
+// ]
+// var postData = [//We add the userID that the posData corresponds to in this case usersData.id
+//   {id: '1', comment: 'first post',  userId: '3' },
+//   {id: '2', comment: 'second post', userId: '1' }
+// ]
 
 //Access our necessary graphql classes
 const  {
@@ -50,13 +55,13 @@ const UserType = new GraphQLObjectType({
     posts: {
       type: new GraphQLList(PostType),//use GRaphQLList to find the posts from a user query
       resolve(parent, args) {
-        return _.filter(postData, {userId: parent.id});//find posts related to the userId from postData that corresponds to the user.id of userType which is linked to usersData in the RootQuery
+        //return _.filter(postData, {userId: parent.id});//find posts related to the userId from postData that corresponds to the user.id of userType which is linked to usersData in the RootQuery
       }
     },
     hobby: {
       type: new GraphQLList(HobbyType),//use GRaphQLList to find the posts from a user query
       resolve(parent, args) {
-      return _.filter(hobbyData, {userId: parent.id});
+        //return _.filter(hobbyData, {userId: parent.id});
       }
     }
   })
@@ -73,7 +78,7 @@ const HobbyType = new GraphQLObjectType({
     user: {
       type: UserType,
       resolve(parent, args){
-        return _.find(usersData, {id: parent.userId})
+        //return _.find(usersData, {id: parent.userId})
       }
     }
   })
@@ -89,7 +94,7 @@ const PostType = new GraphQLObjectType({
     user: {
       type: UserType,
       resolve(parent, args) {
-        return _.find(usersData, {id: parent.userId})//return userID from the parent-PostType that corresponds to the user:{type: UserType} userID is listed in PostType as the id from usersData
+        //return _.find(usersData, {id: parent.userId})//return userID from the parent-PostType that corresponds to the user:{type: UserType} userID is listed in PostType as the id from usersData
       }
     }
   })
@@ -104,7 +109,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       type: UserType,//we create userType and its fields in another const
       args: {id: {type: GraphQLID}}, //Arguments we pass along when we want to retrieve data from our user:
       resolve(parent, args) { // a function that tells graphql where to get the information - get and return data from a datasource
-        return _.find(usersData, {id: args.id})//return in userData the args.ida - notice {id: args.id} was defined under user.args
+        //return _.find(usersData, {id: args.id})//return in userData the args.ida - notice {id: args.id} was defined under user.args
       }
     },
     
@@ -112,7 +117,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
     users: {
       type: GraphQLList(UserType),
       resolve(parent, args){
-        return usersData;
+        //return usersData;
       }
     },
 
@@ -120,7 +125,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       type: HobbyType,
       args: {id: {type: GraphQLID}},
       resolve(parent, args) {
-        return _.find(hobbyData, {id: args.id}) //Make hobbyData and notice the camel case
+        //return _.find(hobbyData, {id: args.id}) //Make hobbyData and notice the camel case
       }
     },
 
@@ -128,7 +133,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
     hobbies: {
       type: GraphQLList(HobbyType),
       resolve(parent,args){
-        return hobbyData;
+        //return hobbyData;
       }
     },
 
@@ -138,7 +143,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       args: {id: {type: GraphQLID}},
       resolve(parent,args){
         //return data (post data)
-        return _.find(postData, {id: args.id})
+        //return _.find(postData, {id: args.id})
       }
     },
 
@@ -146,7 +151,7 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
     posts: {
       type: GraphQLList(PostType),
       resolve(parent,args){
-        return postData;
+        //return postData;
       }
     },
   }
@@ -160,53 +165,59 @@ const Mutation = new GraphQLObjectType({
     CreateUser: {
       type: UserType,
       args: {
-        id: {type: GraphQLID},
+        //id: {type: GraphQLID}, //removed for MongoDB
         name: {type: GraphQLString},
         age: {type: GraphQLInt},
         driving: {type: GraphQLString}
       },
       resolve(parent,args) {
-        let user = {
-          id: args.id,
+        let user = new User ({ //User was imported from our model files
+          //id: args.id, //removed for MongoDB
           name: args.name,
           age: args.age,
           driving: args.driving
-        }//This will save to memory not in database for tutorial only
-        return user;
+        });
+          //This will save to memory not in database for tutorial only
+          //return user; //remove () when saving to memory
+
+          //Save to MongoDB using model files
+          user.save();
       }
     },
     CreatePost: {
       type: PostType,
       args: {
-        id: {type: GraphQLID},
+        //id: {type: GraphQLID}, //remove for MongoDB
         comment: {type: GraphQLString},
         userId: {type: GraphQLID}
       },
       resolve(parent, args) {
-        let post = {
-          id: args.id,
+        let post = new Post ({
+          //id: args.id, //removed for MongoDB
           comment: args.comment,
           userId: args.userId 
-        }
-        return post;
+        });
+        //return post;
+        post.save();
       }
     },
     CreateHobby: {
       type: HobbyType,
       args: {
-        id: {type: GraphQLID},
+        //id: {type: GraphQLID},  //removed for MongoDB
         title: {type: GraphQLString},
         description: {type: GraphQLString},
         userId: {type: GraphQLID}
       },
       resolve(parent, args) {
-        let hobby = {
-          id: args.id,
+        let hobby = new Hobby ({
+          //id: args.id, //removed for MongoDB
           title: args.title,
           description: args.description,
           userId: args.userId
-        }
-        return hobby;
+        });
+        //return hobby;
+        hobby.save();
       }
     }
   }
