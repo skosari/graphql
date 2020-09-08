@@ -182,8 +182,12 @@ const Mutation = new GraphQLObjectType({
 
           //Save to MongoDB using model files
           user.save();
+          
+          //Save to graphi
+          return user;
       }
     },
+
     CreatePost: {
       type: PostType,
       args: {
@@ -199,8 +203,12 @@ const Mutation = new GraphQLObjectType({
         });
         //return post;
         post.save();
+
+        //graphi
+        return post;
       }
     },
+
     CreateHobby: {
       type: HobbyType,
       args: {
@@ -218,6 +226,9 @@ const Mutation = new GraphQLObjectType({
         });
         //return hobby;
         hobby.save();
+      
+        //graphi
+        return hobby;
       }
     }
   }
