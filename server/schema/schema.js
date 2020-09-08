@@ -79,6 +79,9 @@ const HobbyType = new GraphQLObjectType({
       type: UserType,
       resolve(parent, args){
         //return _.find(usersData, {id: parent.userId})
+      
+        //return the UserType-parent
+        return User.findById(parent.userId);      //mongoose method
       }
     }
   })
@@ -95,6 +98,8 @@ const PostType = new GraphQLObjectType({
       type: UserType,
       resolve(parent, args) {
         //return _.find(usersData, {id: parent.userId})//return userID from the parent-PostType that corresponds to the user:{type: UserType} userID is listed in PostType as the id from usersData
+        //
+        return User.findById(parent.userId);          //mongoose method
       }
     }
   })
@@ -107,9 +112,14 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
   fields: {
     user: {
       type: UserType,//we create userType and its fields in another const
-      args: {id: {type: GraphQLID}}, //Arguments we pass along when we want to retrieve data from our user:
+      args: {id: {type: GraphQLString}}, //Arguments we pass along when we want to retrieve data from our user:
       resolve(parent, args) { // a function that tells graphql where to get the information - get and return data from a datasource
         //return _.find(usersData, {id: args.id})//return in userData the args.ida - notice {id: args.id} was defined under user.args
+      
+        //return our user by id using a mongoose model query
+        return User.findById(args.id);
+      
+
       }
     },
     
@@ -118,14 +128,19 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       type: GraphQLList(UserType),
       resolve(parent, args){
         //return usersData;
+        //
+        //find all users using mongoose method
+        return User.find({});
       }
     },
 
     hobby: {
       type: HobbyType,
-      args: {id: {type: GraphQLID}},
+      args: {id: {type: GraphQLString}},
       resolve(parent, args) {
         //return _.find(hobbyData, {id: args.id}) //Make hobbyData and notice the camel case
+        return Hobby.findById(args.id);           //mongoose method 
+        
       }
     },
 
@@ -133,7 +148,9 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
     hobbies: {
       type: GraphQLList(HobbyType),
       resolve(parent,args){
-        //return hobbyData;
+        //return hobbyData;                       //localhost
+        //
+        return Hobby.find({});                    //mongose method
       }
     },
 
@@ -142,8 +159,11 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
       description: 'Post new item',
       args: {id: {type: GraphQLID}},
       resolve(parent,args){
-        //return data (post data)
-        //return _.find(postData, {id: args.id})
+        //return data (post data)                 //localhost
+        //return _.find(postData, {id: args.id})  //lodash
+        
+        return Post.findById(args.id);            //mongoose method
+
       }
     },
 
@@ -151,7 +171,9 @@ const RootQuery = new GraphQLObjectType({//RootQuery is also what we export
     posts: {
       type: GraphQLList(PostType),
       resolve(parent,args){
-        //return postData;
+        //return postData;                        //localhost
+        
+        return Post.find({});                     //mongoose method
       }
     },
   }

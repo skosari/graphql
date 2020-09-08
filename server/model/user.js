@@ -6,10 +6,10 @@ const UserType = new GraphQLObjectType({
   name: 'User',
   description: 'Documentation for user...',
   fields: () => ({
-    id:      {type: GraphQLID},
-    name:    {type: GraphQLString},
-    age:     {type: GraphQLInt},
-    driving: {type: GraphQLString}
+    id:      {type: GraphQLID},     = String
+    name:    {type: GraphQLString}, = String
+    age:     {type: GraphQLInt},    = Number
+    driving: {type: GraphQLString}  = String
 */
 
 const userSchema = new MongooseSchema({
